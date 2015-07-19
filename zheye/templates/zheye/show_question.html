@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block left_content %}
+	<h4 class="bg-info text-center">{{question.sortion}}</h4>
+	<h2>{{question}}</h2>
+	<p>{{question.question_long}}</p>
+	{%for answer in answers%}		
+	 <div style="width:700px;border-top:1px solid #eee">
+		<button type="button" class="btn btn-default vote_up" aria-label="Left Align" answer_id={{answer.id}}>
+			<span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span><span class="votes_up">{{answer.vote_up}}</span>
+		</button>
+		<button type="button" class="btn btn-default vote_down" aria-label="Left Align" answer_id={{answer.id}}>
+			<span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span><span class="votes_down">{{answer.vote_down}}</span>
+		</button>
+			<p><a href="#"><strong class='a_default'>{{answer.author}}</strong></a> {{answer.author.intro_short}}</p>
+			<p>{{answer}}</p>
+	 </div>
+	{%endfor%}
+	<form method="post" action="{% url 'add_answer' %}">
+		{% csrf_token %}
+			<textarea class="form-control" name="answer_text" question_id={{question.id}}></textarea>
+			<input type='hidden' name="hidden" value={{question.id}}></input>
+			<button type="submit" class="btn btn-primary pull-right" style="margin-top:10px">
+               发布回答
+			</button>
+	</form>
+{% endblock %}
+{% block right_content %}
+{% endblock %}

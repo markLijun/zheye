@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>{% block title %}{% endblock %}</title>
+	{% load staticfiles %}
+	<link href="{% static 'zheye/css/bootstrap.min.css' %}" rel="stylesheet">
+	{% load staticfiles %}
+	<script type="text/javascript" src="{% static 'zheye/js/jquery-1.11.3.min.js' %}"></script>
+	{% load staticfiles %}
+	<script type="text/javascript" src="{% static 'zheye/js/bootstrap.js' %}"></script>
+   <style type="text/css">
+		body,button, input, select, textarea,h1 ,h2, h3, h4, h5, h6 { font-family: Microsoft YaHei,'宋体' , Tahoma, Helvetica, Arial, "\5b8b\4f53", sans-serif;}
+		.a_muted{
+			color:#999;
+		}
+		.a_default{
+			color:#000;
+		}
+		a {
+			color: #259;
+			font-size:14px;
+			text-decoration: none;
+			}
+		.replys li{
+			border:1px solid #eee;
+		}
+   </style>
+   <script type="text/javascript">
+		$(document).ready(function(){
+		test=1;
+		
+		$("#sortion").bind("keyup focus",function(){
+		if($(this).val()!=''){
+		keyword=$(this).val();
+		result=$.ajax({url:"{%url 'test'%}",
+		async:false,
+		dataType: "json",
+		data: {sortion:keyword,},
+		});
+		$("#myDiv").html(result.responseText);
+		$(".tips li").on("mouseover",function () {
+				$("#sortion").val($(this).text());
+				$("#hidden_sortion").val($(this).text());
+            });
+		 $(".tips li").on({  
+                mouseenter: function () {  
+                    $(this).css("background-color", "#39C0FA");//鼠标移入事件  
+                },  
+                mouseleave: function () {  
+                    $(this).css("background-color", "white");//鼠标移出事件  
+                }  
+            });  
+		}
+	else{
+		$("#myDiv").html("");
+	}
+  });
+  
+  $("#sortion").blur(function(){
+		$("#myDiv").html("");
+		});
+
+	$(".focus").on("click",function(){
+			result=$.ajax({url:"{%url 'focus'%}",
+				async:false,
+				data: {question_id:$(this).attr('question_id'),},
+						});
+		})
+		
+	$(".focus").on("click",function(){
+		if($(this).text()=="关注")
+			$(this).html("<span style='color:#259'><span class='glyphicon glyphicon-heart-empty' aria-hidden='true'></span>取消关注</span>")
+		else
+			$(this).text("关注")
+});
+		
+	$(".collect").on("click",function(){
+			result=$.ajax({url:"{%url 'collect'%}",
+				async:false,
+				data: {answer_id:$(this).attr('answer_id'),},
+						});
+		})
+		
+	$(".collect").on("click",function(){
+		if($(this).text()=="收藏")
+			$(this).html("<span style='color:#259'><span class='glyphicon glyphicon-star-empty' aria-hidden='true'></span>取消收藏</span>")
+		else
+			$(this).text("收藏")
+});
+
+		$(".answer_reply").bind("click",function(){
+		 if(test){
+			result=$.ajax({url:"{%url 'ajax_reply'%}",
+				async:false,
+				dataType: "json",
+				data: {answer_id:$(this).attr('name'),},
+						});	
+			$(this).parent().parent().append(result.responseText);
+			$(".add_reply_button").on("click",function(){
+				haha=$.ajax({url:"{%url 'add_reply'%}",
+				async:false,
+				data: {sss:$(this).parent().parent().children('.hidden_store').val(),reply_text:$(this).prev().val()},
+						});
+				$(this).prev().prev().append('<li>'+$(this).prev().val()+'</li>');
+			})
+			test=0;
+					}
+		else{
+			$(this).parent().next().toggle();
+	
+			}
+  })
+  
+  $(".vote_up").on("click",function(){
+			$(this).unbind('click');
+			$(this).next().unbind('click');
+			var me = this
+			result=$.ajax({url:"{%url 'vote_up'%}",
+				async:false,
+				data: {answer_id:$(this).attr('answer_id'),},
+				success:function(data){$(me).children(".votes_up").text(data);}
+						});		
+		})
+		
+	$(".vote_down").on("click",function(){
+			$(this).unbind('click');
+			$(this).prev().unbind('click');
+			var me = this
+			result=$.ajax({url:"{%url 'vote_down'%}",
+				async:false,
+				data: {answer_id:$(this).attr('answer_id'),},
+				success:function(data){$(me).children(".votes_down").text(data);}
+						});		
+		})
+  
+});
+	</script>
+</head>
+<body>
+<nav class="navbar navbar-default">
+ <div class="row">
+	<div class="col-md-1"></div>
+	<div class="col-md-10">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{%url 'index'%}">者也</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="{%url 'index'%}">首页 <span class="sr-only">(current)</span></a></li>
+        <li><a href="#">话题</a></li>
+        <li><a href="#">发现</a></li>   
+		<li> <a data-toggle="modal" data-target="#questionModal" style="cursor:pointer">提问</a></li>
+      </ul>
+      <form class="navbar-form navbar-left" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="搜索话题、问题或人……">
+        </div>
+		</form>
+		<div class="modal fade" id="questionModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <a class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </a>
+			提问
+         </div>
+         <div class="modal-body">
+<form method="post" action="{% url 'add_question' %}">
+{% csrf_token %}
+	<div class="form-group">
+		<textarea rows="2" class="form-control" name="question_short"></textarea>
+	</div>
+	<div class="form-group">
+		<label for="question_long">问题描述:</label>
+		<textarea id="question_long" class="form-control" rows="4" name="question_long"></textarea>
+	</div>
+<div class="form-group">
+		<label for="sortion">分类:</label>
+		<input id="sortion" maxlength="20" name="sortion" type="text" placeholder="输入分类名,在下拉菜单中选择" class="form-control" autocomplete="off" >
+		<div id='myDiv'></div>
+</div>
+		<input type='hidden' id='hidden_sortion' name='hidden_sortion'>
+	 <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">
+               提交
+            </button>
+         </div>
+</form>
+         </div>
+        
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+      <ul class="nav navbar-nav navbar-right">
+	  	 {%if user.is_authenticated%}
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{user.username}} <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">我的主页</a></li>
+            <li><a href="#">私信</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="{% url 'logout'%}">退出</a></li>
+          </ul>
+        </li>
+		{%else%}
+		<li>
+			<a style="cursor:pointer" data-toggle="modal" data-target="#myModal">
+				登录
+			</a>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <a class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </a>
+         </div>
+         <div class="modal-body">
+<form method="post" action="{% url 'login' %}">
+{% csrf_token %}
+	<div class="form-group">
+		<label for="id_username">用户名:</label>
+		<input id="id_username" maxlength="30" name="username" type="text" placeholder="用户名" class="form-control">
+	</div>
+	<div class="form-group">
+		<label for="id_password">密码:</label>
+		<input id="id_password" maxlength="128" name="password" type="password" placeholder="密码" class="form-control">
+	</div>
+	 <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">
+               登录
+            </button>
+         </div>
+</form>
+         </div>
+        
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+		</li>
+		<li>
+			<a href="{%url 'register'%}">注册</a>
+		</li>
+		{%endif%}
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+  </div>
+  </div>
+  <div class="col-md-1"></div>
+</nav>
+
+<div class="row">
+	<div class="col-md-2"></div>
+	<div class="col-md-8">
+	 <div class="row">
+		<div class="col-md-8">
+			{% block left_content %}
+			{% endblock %}
+		</div>
+		<div class="col-md-4">
+			{% block right_content %}
+			{% endblock %}
+		</div>
+	 </div>
+	</div>
+	<div class="col-md-2"></div>

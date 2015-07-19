@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+	{% block left_content %}
+		{%for ship in ships%}
+			<div style="width:700px;border-top:1px solid #eee">
+				<div class="question_source text-muted" style="margin:10px 0 10px 0">
+					<a href="#"><span class="a_muted">{{ship.person}}</span></a><span class="a_muted">{{ship.get_PAShip_display}}了该
+					{%if ship.PAShip == "vote" or ship.PAShip == "collect"%}
+						答案
+					{%else%}
+						问题
+					{%endif%}
+					</span>
+				</div>
+				{% if ship.PAShip != "focus" and ship.PAShip != "raise"%}
+					<h4><a href="/question/{{ship.answer.question.id}}/"><span>{{ship.answer.question}}</span></a></h4>
+					<p><a href="#"><strong class='a_default'>{{ship.answer.author}}</strong></a> {{ship.answer.author.intro_short}}</p>
+					<p>{{ship.answer|slice:"60"}}</p>
+				{%else%}
+					<h4><a href="/question/{{ship.question.id}}/"><span>{{ship.question.question_short}}</span></a></h4>
+				{%endif%}
+				<div class="answer_panel text-muted">
+					<input id="ggg" type='hidden' class="hidden_store" value={{ship.answer.id}}></input>
+					{% if ship.PAShip != "focus" and ship.PAShip != "raise" and ship.PAShip != "collect" and ship.person.id == user.id%}
+							<a><span class="a_muted focus" question_id={{ship.answer.question.id}} style="cursor:pointer;color:#259"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span>取消关注</span></a>
+					{% endif %}
+					{% if ship.PAShip != "focus" and ship.PAShip != "raise" and ship.person.id != user.id%}
+							<a><span class="a_muted focus" question_id={{ship.answer.question.id}} style="cursor:pointer">关注</span></a>
+					{% endif %}
+					{% if ship.PAShip == "focus" or ship.PAShip == "raise" %}
+						{% if ship.person.id == user.id %}
+						<a><span class="a_muted focus" question_id={{ship.question.id}} style="cursor:pointer;color:#259"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span>取消关注</span></a>
+						{% endif %}
+					{% endif %}
+					{% if ship.PAShip == "focus" or ship.PAShip == "raise" %}
+						{% if ship.person.id != user.id %}
+						<a><span class="a_muted focus" question_id={{ship.question.id}} style="cursor:pointer">关注</span></a>
+						{% endif %}
+					{% endif %}
+					 {% if ship.PAShip != "focus" and ship.PAShip != "raise" and ship.PAShip != "focus" and ship.person.id != user.id %}
+						<a><span class="a_muted collect" answer_id={{ship.answer.id}} style="cursor:pointer">收藏</span></a>
+					 {%endif%}
+					  {% if ship.PAShip != "focus" and ship.PAShip != "raise" and ship.PAShip != "focus" and ship.person.id == user.id %}
+						<a><span class="a_muted collect" answer_id={{ship.answer.id}} style="cursor:pointer;color:#259"><span class='glyphicon glyphicon-star-empty' aria-hidden='true'></span>取消收藏</span></a>
+					 {%endif%}
+					 {% if ship.PAShip != "focus" and ship.PAShip != "raise" %}
+					<a><span class="answer_reply a_muted" name="{{ship.answer.id}}" style="cursor:pointer">{{ship.answer.answer_replys_in_the_answer.count}}条评论</span></a>
+					{% endif %}
+					
+				</div>
+			</div>
+		{%endfor%}	
+	{% endblock %}
+	{% block right_content %}
+	{% endblock %}
